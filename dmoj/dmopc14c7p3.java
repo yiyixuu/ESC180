@@ -23,11 +23,11 @@ public class dmopc14c7p3 {
             left[i] = readInt();
         }
 
-        for(int i = 0; i < R; i++) {
-			for (int j : left) {
-				if(right[i] == j) cnt++;
-			}
-        } 
+        Arrays.sort(left);
+
+		for(int i = 0; i < R; i++) {
+			if(Arrays.binarySearch(left, right[i]) >= 0) cnt++;
+		} 
 
         System.out.println(N-cnt);
     }
