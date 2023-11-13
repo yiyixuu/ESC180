@@ -85,17 +85,16 @@ def detect_rows(board, col, length):
     return open_seq_count, semi_open_seq_count
     
 def search_max(board):
-    max_score = float("-inf")
-    move_y, move_x = None, None
-    for y in range(len(board)):
-        for x in range(len(board[0])):
-            if board[y][x] == " ":
-                board[y][x] = "b"
-                curr_score = score(board)
-                if curr_score > max_score:
-                    max_score = curr_score
-                    move_y, move_x = y, x
-                board[y][x] = " "
+    max = -100000000
+    move_y, move_x = 0, 0
+    for a in range(len(board)):
+        for b in range(len(board)):
+            if board[a][b] == " ":
+                board[a][b] = "b"
+                if score(board) > max:
+                    max = score(board)
+                    move_y, move_x = a, b
+                board[a][b] = " "
 
     return move_y, move_x
 
