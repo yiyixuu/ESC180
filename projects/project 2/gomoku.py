@@ -33,26 +33,50 @@ def is_bounded(board, y_end, x_end, length, d_y, d_x):
 def is_sq_on_board(board, y, x):
     return 0 <= y < len(board) and 0 <= x < len(board[0])
     
+# def detect_row(board, col, y_start, x_start, length, d_y, d_x):
+#     open_seq_count = 0
+#     semi_open_seq_count = 0
+    
+#     # Check if the sequence is out of bounds
+#     if not is_sq_on_board(board, y_start + (length - 1) * d_y, x_start + (length - 1) * d_x):
+#         return open_seq_count, semi_open_seq_count
+    
+#     # Check if the sequence is open or semi-open
+#     if all(is_sq_on_board(board, y_start + i*d_y, x_start + i*d_x) and board[y_start + i*d_y][x_start + i*d_x] == col for i in range(length)):
+#         if is_bounded(board, y_start + (length - 1) * d_y, x_start + (length - 1) * d_x, length, -d_y, -d_x) == "OPEN":
+#             if all(board[y_start + i*d_y][x_start + i*d_x] == col for i in range(length)):
+#                 open_seq_count += 1
+#         elif is_bounded(board, y_start + (length - 1) * d_y, x_start + (length - 1) * d_x, length, -d_y, -d_x) == "SEMIOPEN":
+#             if all(board[y_start + i*d_y][x_start + i*d_x] == col for i in range(length-1)) and board[y_start - d_y][x_start - d_x] == " ":
+#                 semi_open_seq_count += 1
+#             elif all(board[y_start + i*d_y][x_start + i*d_x] == col for i in range(1, length)) and board[y_start + length*d_y][x_start + length*d_x] == " ":
+#                 semi_open_seq_count += 1
+    
+#     return open_seq_count, semi_open_seq_count
+
 def detect_row(board, col, y_start, x_start, length, d_y, d_x):
     open_seq_count = 0
     semi_open_seq_count = 0
-    
-    # Check if the sequence is out of bounds
-    if not is_sq_on_board(board, y_start + (length - 1) * d_y, x_start + (length - 1) * d_x):
+    y_end, x_end = y_start + (length - 1) * d_y, x_start + (length - 1) * d_x
+
+    # Check if the sequence start and end are on the board
+    if not is_sq_on_board(board, y_start, x_start) or not is_sq_on_board(board, y_end, x_end):
         return open_seq_count, semi_open_seq_count
-    
-    # Check if the sequence is open or semi-open
-    if is_bounded(board, y_start + (length - 1) * d_y, x_start + (length - 1) * d_x, length, -d_y, -d_x) == "OPEN":
-        if all(board[y_start + i*d_y][x_start + i*d_x] == col for i in range(length)):
+
+    # Check if all cells in the sequence match the specified color
+    if all(board[y_start + i * d_y][x_start + i * d_x] == col for i in range(length)):
+        before_seq = is_sq_on_board(board, y_start - d_y, x_start - d_x) and board[y_start - d_y][x_start - d_x]
+        after_seq = is_sq_on_board(board, y_end + d_y, x_end + d_x) and board[y_end + d_y][x_end + d_x]
+
+        if before_seq == " " and after_seq == " ":
             open_seq_count += 1
-    elif is_bounded(board, y_start + (length - 1) * d_y, x_start + (length - 1) * d_x, length, -d_y, -d_x) == "SEMIOPEN":
-        if all(board[y_start + i*d_y][x_start + i*d_x] == col for i in range(length-1)) and board[y_start - d_y][x_start - d_x] == " ":
-            semi_open_seq_count += 1
-        elif all(board[y_start + i*d_y][x_start + i*d_x] == col for i in range(1, length)) and board[y_start + length*d_y][x_start + length*d_x] == " ":
-            semi_open_seq_count += 1
-    
+        elif before_seq == " " or after_seq == " ":
+            if before_seq != col and after_seq != col:  # Ensure the sequence is not surrounded by same color stones
+                semi_open_seq_count += 1
+
     return open_seq_count, semi_open_seq_count
-    
+
+
 def detect_rows(board, col, length):
     open_seq_count, semi_open_seq_count = 0, 0
     
@@ -131,9 +155,10 @@ def score(board):
 def is_win(board):
     for y in range(len(board)):
         for x in range(len(board[0])):
-            for d_y, d_x in [(0, 1), (1, 0), (1, 1), (1, -1)]:
-                if detect_row(board, board[y][x], y, x, 5, d_y, d_x)[0] > 0:
-                    return f"{board[y][x]} won"
+            if board[y][x] == " ":
+                for d_y, d_x in [(0, 1), (1, 0), (1, 1), (1, -1)]:
+                    if detect_row(board, board[y][x], y, x, 5, d_y, d_x)[0] > 0:
+                        return f"{board[y][x]} won"
     if is_empty(board):
         return "Draw"
     return None
@@ -436,5 +461,5 @@ def some_tests():
   
             
 if __name__ == '__main__':
-    play_gomoku(8)
+    some_tests()
     
