@@ -153,15 +153,21 @@ def score(board):
 
     
 def is_win(board):
-    for y in range(len(board)):
-        for x in range(len(board[0])):
-            if board[y][x] == " ":
-                for d_y, d_x in [(0, 1), (1, 0), (1, 1), (1, -1)]:
-                    if detect_row(board, board[y][x], y, x, 5, d_y, d_x)[0] > 0:
-                        return f"{board[y][x]} won"
-    if is_empty(board):
+    if detect_rows(board, "b", 5)[0] >= 1 or detect_rows(board, "b", 5)[1] >= 1:
+        return "Black won"
+    elif detect_rows(board, "w", 5)[0] >= 1 or detect_rows(board, "w", 5)[1] >= 1:
+        return "White won"
+    elif is_full(board):
         return "Draw"
-    return None
+    else:
+        return "Continue playing"
+    
+def is_full(board):
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == " ":
+                return False
+    return True
 
 
 
@@ -461,5 +467,5 @@ def some_tests():
   
             
 if __name__ == '__main__':
-    some_tests()
+    play_gomoku(8)
     
