@@ -142,11 +142,71 @@ def score(board):
             10   * semi_open_b[3]                +  
             open_b[2] + semi_open_b[2] - open_w[2] - semi_open_w[2])
 
+def detect_closed_rows(board, col, length):    
+    closed_seq_count = 0
+
+    #check horizontal
+    for y in range(len(board)):
+        closed_seq_count += detect_closed_row(board, col, y, 0, length, 0, 1)
+
+    #check vertical
+    for x in range(len(board)):
+        closed_seq_count += detect_closed_row(board, col, 0, x, length, 1, 0)
+    
+    #check diagonal going down and right from left side
+    for y in range(len(board)):
+        closed_seq_count += detect_closed_row(board, col, y, 0, length, 1, 1)
+    
+    #check diagonal going down and right from top side
+    for x in range(1, len(board)):
+        closed_seq_count += detect_closed_row(board, col, 0, x, length, 1, 1)
+
+    #check diagonal going down and left from right side
+    for y in range(1, len(board)):
+        closed_seq_count += detect_closed_row(board, col, y, len(board) - 1, length, 1, -1)
+
+    #check diagonal going down and left from top side
+    for x in range(len(board)):
+        closed_seq_count += detect_closed_row(board, col, 0, x, length, 1, -1)
+    
+    return closed_seq_count
+
+def detect_closed_row(board, col, y_start, x_start, length, d_y, d_x):
+    """Returns True if there is a sequence of identical non-space 
+    values in the given direction from the starting position.
+    Returns False otherwise.
+    """
+    if not is_sq_on_board(board, y_start, x_start):
+        return False
+    
+    if board[y_start][x_start] != col:
+        return False
+    
+    if length == 1:
+        return True
+    
+    y_end = y_start + (length - 1) * d_y
+    x_end = x_start + (length - 1) * d_x
+    
+    if not is_sq_on_board(board, y_end, x_end):
+        return False
+    
+    if board[y_end][x_end] != col:
+        return False
+    
+    if length == 2:
+        return True
+    
+    if is_bounded(board, y_end, x_end, length, -d_y, -d_x) and is_bounded(board, y_start, x_start, length, d_y, d_x):
+        return True
+    
+    return False
+    
     
 def is_win(board):
-    if detect_rows(board, "b", 5)[0] >= 1 or detect_rows(board, "b", 5)[1] >= 1:
+    if detect_rows(board, "b", 5)[0] >= 1 or detect_rows(board, "b", 5)[1] >= 1 or detect_closed_rows(board, "b", 5) >= 1:
         return "Black won"
-    elif detect_rows(board, "w", 5)[0] >= 1 or detect_rows(board, "w", 5)[1] >= 1:
+    elif detect_rows(board, "w", 5)[0] >= 1 or detect_rows(board, "w", 5)[1] >= 1 or detect_closed_rows(board, "w", 5) >= 1:
         return "White won"
     elif is_full(board):
         return "Draw"
@@ -458,5 +518,5 @@ def some_tests():
   
             
 if __name__ == '__main__':
-    # play_gomoku(8)
-    test_detect_rows()
+    play_gomoku(8)
+    # easy_testset_for_main_functions()
