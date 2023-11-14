@@ -32,79 +32,70 @@ def is_bounded(board, y_end, x_end, length, d_y, d_x):
 
 def is_sq_on_board(board, y, x):
     return 0 <= y < len(board) and 0 <= x < len(board[0])
-    
-# def detect_row(board, col, y_start, x_start, length, d_y, d_x):
-#     open_seq_count = 0
-#     semi_open_seq_count = 0
-    
-#     # Check if the sequence is out of bounds
-#     if not is_sq_on_board(board, y_start + (length - 1) * d_y, x_start + (length - 1) * d_x):
-#         return open_seq_count, semi_open_seq_count
-    
-#     # Check if the sequence is open or semi-open
-#     if all(is_sq_on_board(board, y_start + i*d_y, x_start + i*d_x) and board[y_start + i*d_y][x_start + i*d_x] == col for i in range(length)):
-#         if is_bounded(board, y_start + (length - 1) * d_y, x_start + (length - 1) * d_x, length, -d_y, -d_x) == "OPEN":
-#             if all(board[y_start + i*d_y][x_start + i*d_x] == col for i in range(length)):
-#                 open_seq_count += 1
-#         elif is_bounded(board, y_start + (length - 1) * d_y, x_start + (length - 1) * d_x, length, -d_y, -d_x) == "SEMIOPEN":
-#             if all(board[y_start + i*d_y][x_start + i*d_x] == col for i in range(length-1)) and board[y_start - d_y][x_start - d_x] == " ":
-#                 semi_open_seq_count += 1
-#             elif all(board[y_start + i*d_y][x_start + i*d_x] == col for i in range(1, length)) and board[y_start + length*d_y][x_start + length*d_x] == " ":
-#                 semi_open_seq_count += 1
-    
-#     return open_seq_count, semi_open_seq_count
 
 def detect_row(board, col, y_start, x_start, length, d_y, d_x):
     open_seq_count = 0
     semi_open_seq_count = 0
-    y_end, x_end = y_start + (length - 1) * d_y, x_start + (length - 1) * d_x
 
-    # Check if the sequence start and end are on the board
-    if not is_sq_on_board(board, y_start, x_start) or not is_sq_on_board(board, y_end, x_end):
-        return open_seq_count, semi_open_seq_count
+    c_row = y_start
+    c_col = x_start
 
-    # Check if all cells in the sequence match the specified color
-    if all(board[y_start + i * d_y][x_start + i * d_x] == col for i in range(length)):
-        before_seq = is_sq_on_board(board, y_start - d_y, x_start - d_x) and board[y_start - d_y][x_start - d_x]
-        after_seq = is_sq_on_board(board, y_end + d_y, x_end + d_x) and board[y_end + d_y][x_end + d_x]
-
-        if before_seq == " " and after_seq == " ":
-            open_seq_count += 1
-        elif before_seq == " " or after_seq == " ":
-            if before_seq != col and after_seq != col:  # Ensure the sequence is not surrounded by same color stones
+    for i in range(len(board)):
+        if is_sequence_complete(board, col, c_row, c_col, length, d_y, d_x):
+            y_end = c_row + (length - 1) * d_y
+            x_end = c_col + (length - 1) * d_x
+            s = is_bounded(board, y_end, x_end, length, d_y, d_x)
+            if s == "OPEN":
+                open_seq_count += 1
+                # print(f"open @ y_end {y_end} x_end {x_end} length {length} d_y {d_y} d_x {d_x}")
+            if s == "SEMIOPEN":
                 semi_open_seq_count += 1
+                # print(f"semi @ y_end {y_end} x_end {x_end} length {length} d_y {d_y} d_x {d_x}")
+
+        c_row += d_y
+        c_col += d_x
 
     return open_seq_count, semi_open_seq_count
 
 
 def detect_rows(board, col, length):
     open_seq_count, semi_open_seq_count = 0, 0
+
+    #check horizontal
+    for y in range(len(board)):
+        open_seq, semi_seq = detect_row(board, col, y, 0, length, 0, 1)
+        open_seq_count += open_seq
+        semi_open_seq_count += semi_seq
+
+    #check vertical
+    for x in range(len(board)):
+        open_seq, semi_seq = detect_row(board, col, 0, x, length, 1, 0)
+        open_seq_count += open_seq
+        semi_open_seq_count += semi_seq
     
-    for i in range(len(board)):
-        for j in range(len(board[0])):
-            # Check horizontal row
-            if j <= len(board[0]) - length:
-                open_seq, semi_open_seq = detect_row(board, col, i, j, length, 0, 1)
-                open_seq_count += open_seq
-                semi_open_seq_count += semi_open_seq
-                
-            # Check vertical row
-            if i <= len(board) - length:
-                open_seq, semi_open_seq = detect_row(board, col, i, j, length, 1, 0)
-                open_seq_count += open_seq
-                semi_open_seq_count += semi_open_seq
-                
-            # Check diagonal row (top-left to bottom-right)
-            if i <= len(board) - length and j <= len(board[0]) - length:
-                open_seq, semi_open_seq = detect_row(board, col, i, j, length, 1, 1)
-                open_seq_count += open_seq
-                semi_open_seq_count += semi_open_seq
-                
-            # Check diagonal row (bottom-left to top-right)
-            if i >= length - 1 and j <= len(board[0]) - length:
-                open_seq, semi_open_seq = detect_row(board, col, i, j, length, -1, 1)
-                open_seq_count += open_seq
-                semi_open_seq_count += semi_open_seq
+    #check diagonal going down and right from left side
+    for y in range(len(board)):
+        open_seq, semi_seq = detect_row(board, col, y, 0, length, 1, 1)
+        open_seq_count += open_seq
+        semi_open_seq_count += semi_seq
+    
+    #check diagonal going down and right from top side
+    for x in range(1, len(board)):
+        open_seq, semi_seq = detect_row(board, col, 0, x, length, 1, 1)
+        open_seq_count += open_seq
+        semi_open_seq_count += semi_seq
+
+    #check diagonal going down and left from right side
+    for y in range(1, len(board)):
+        open_seq, semi_seq = detect_row(board, col, y, len(board) - 1, length, 1, -1)
+        open_seq_count += open_seq
+        semi_open_seq_count += semi_seq
+
+    #check diagonal going down and left from top side
+    for x in range(len(board)):
+        open_seq, semi_seq = detect_row(board, col, 0, x, length, 1, -1)
+        open_seq_count += open_seq
+        semi_open_seq_count += semi_seq
     
     return open_seq_count, semi_open_seq_count
     
@@ -427,9 +418,9 @@ def some_tests():
     #     
     
     y = 5; x = 3; d_x = -1; d_y = 1; length = 1
-    put_seq_on_board(board, y, x, d_y, d_x, length, "b");
-    print_board(board);
-    analysis(board);
+    put_seq_on_board(board, y, x, d_y, d_x, length, "b")
+    print_board(board)
+    analysis(board)
     
     #        Expected output:
     #           *0|1|2|3|4|5|6|7*
@@ -467,5 +458,5 @@ def some_tests():
   
             
 if __name__ == '__main__':
-    play_gomoku(8)
-    
+    # play_gomoku(8)
+    test_detect_rows()
