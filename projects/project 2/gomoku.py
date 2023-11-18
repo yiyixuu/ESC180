@@ -203,15 +203,30 @@ def detect_closed_row(board, col, y_start, x_start, length, d_y, d_x):
     return False
     
     
+# def is_win(board):
+#     if detect_rows(board, "b", 5)[0] >= 1 or detect_rows(board, "b", 5)[1] >= 1 or detect_closed_rows(board, "b", 5) >= 1:
+#         return "Black won"
+#     if detect_rows(board, "w", 5)[0] >= 1 or detect_rows(board, "w", 5)[1] >= 1 or detect_closed_rows(board, "w", 5) >= 1:
+#         return "White won"
+#     if is_full(board):
+#         return "Draw"
+    
+#     return "Continue playing"
+
 def is_win(board):
-    if detect_rows(board, "b", 5)[0] >= 1 or detect_rows(board, "b", 5)[1] >= 1 or detect_closed_rows(board, "b", 5) >= 1:
-        return "Black won"
-    elif detect_rows(board, "w", 5)[0] >= 1 or detect_rows(board, "w", 5)[1] >= 1 or detect_closed_rows(board, "w", 5) >= 1:
-        return "White won"
-    elif is_full(board):
+    for y in range(len(board)):
+        for x in range(len(board)):
+            for d_y in [-1, 0, 1]:
+                for d_x in [-1, 0, 1]:
+                    if is_sequence_complete(board, "b", y, x, 5, d_y, d_x): 
+                        return "Black won"
+                    if is_sequence_complete(board, "w", y, x, 5, d_y, d_x): 
+                        return "White won"
+    
+    if is_full(board):
         return "Draw"
-    else:
-        return "Continue playing"
+    
+    return "Continue playing"
     
 def is_full(board):
     for i in range(len(board)):
