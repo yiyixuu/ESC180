@@ -174,7 +174,6 @@ class Ball:
                     
                     c += 1
                 theta = paddle.get_angle(self.frect.pos[1]+.5*self.frect.size[1])
-                print(f'angle: {theta*180/math.pi:.4f}')
                 
 
                 v = self.speed
@@ -390,7 +389,7 @@ def init_game():
     import chaser_ai, pong_ai, aryan_ai
     
     # paddles[0].move_getter = chaser_ai.pong_ai
-    paddles[0].move_getter = aryan_ai.pong_ai
+    paddles[0].move_getter = chaser_ai.pong_ai
     # paddles[1].move_getter = directions_from_input 
     paddles[1].move_getter = pong_ai.pong_ai 
     

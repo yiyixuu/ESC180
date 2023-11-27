@@ -18,7 +18,6 @@ def get_y_for_angle(paddle_frect, angle):
     rel_dist_from_c = sign * angle / paddle_frect.size[1] * 180 / math.pi
     rel_dist_from_c = min(0.5, rel_dist_from_c)
     rel_dist_from_c = max(-0.5, rel_dist_from_c)
-    print(f'rel_dist_from_c: {rel_dist_from_c:.2f}')
     return center + rel_dist_from_c * paddle_frect.size[1]
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
@@ -121,21 +120,21 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     #     else:
     #         return None
     
-    # # always move edge of paddle to predicted y
-    # if other_paddle_center_y < table_size[1] / 2:
-    #     if paddle_frect.pos[1] > predicted_y:
-    #         return 'up'
-    #     elif paddle_frect.pos[1] < predicted_y:
-    #         return 'down'
-    #     else:
-    #         return None
-    # else:
-    #     if paddle_frect.pos[1] + paddle_frect.size[1]> predicted_y:
-    #         return 'up'
-    #     elif paddle_frect.pos[1] + paddle_frect.size[1] < predicted_y:
-    #         return 'down'
-    #     else:
-    #         return None
+    # always move edge of paddle to predicted y
+    if other_paddle_center_y < table_size[1] / 2:
+        if paddle_frect.pos[1] > predicted_y:
+            return 'up'
+        elif paddle_frect.pos[1] < predicted_y:
+            return 'down'
+        else:
+            return None
+    else:
+        if paddle_frect.pos[1] + paddle_frect.size[1]> predicted_y:
+            return 'up'
+        elif paddle_frect.pos[1] + paddle_frect.size[1] < predicted_y:
+            return 'down'
+        else:
+            return None
 
     # # Calculate the angle between the ball and the paddle
     # if other_paddle_center_y > table_size[1] / 2:
@@ -159,12 +158,12 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     # else:
     #     return None
 
-    # always move center of paddle to predicted y
-    if paddle_center_y > predicted_y:
-        # print('up')
-        return 'up'
-    elif paddle_center_y < predicted_y:
-        # print('down')
-        return 'down'
-    else:
-        return None
+    # # always move center of paddle to predicted y
+    # if paddle_center_y > predicted_y:
+    #     # print('up')
+    #     return 'up'
+    # elif paddle_center_y < predicted_y:
+    #     # print('down')
+    #     return 'down'
+    # else:
+    #     return None
