@@ -30,12 +30,12 @@ def build_semantic_descriptors(sentences):
         for word in unique_words:
             if word not in d:
                 d[word] = {}
-                for other_word in sentence:
-                    if other_word != word:
-                        if other_word in d[word]:
-                            d[word][other_word] += 1
-                        else:
-                            d[word][other_word] = 1
+            for other_word in sentence:
+                if other_word != word:
+                    if other_word in d[word]:
+                        d[word][other_word] += 1
+                    else:
+                        d[word][other_word] = 1
             else:
                 for other_word in sentence:
                     if other_word != word:
@@ -46,7 +46,31 @@ def build_semantic_descriptors(sentences):
     return d
 
 def build_semantic_descriptors_from_files(filenames):
-    for file in filenames:
+    sentences = []
+    for filename in filenames:
+        with open(filename, "r", encoding="latin1") as file:
+            content = file.read()
+
+            # Splitting into sentences
+            for punct in [".", "!", "?"]:
+                content = content.replace(punct, "|")
+            sentences_list = content.split("|")
+
+            # Processing each sentence
+            for sentence in sentences_list:
+                for punct in [",", "-", "--", ":", ";"]:
+                    sentence = sentence.replace(punct, " ")
+                words = sentence.strip().lower().split()
+                if words:
+                    sentences.append(words)
+    
+    return build_semantic_descriptors(sentences)
+    
+filenames = "/Users/shaanjain/Downloads/ENGSCI/FIRST YEAR/SEM 1/esc180/Projects/ESC180-1/projects/project 3/test.txt"
+print(build_semantic_descriptors_from_files([filenames]))
+
+        
+
         
 
 
