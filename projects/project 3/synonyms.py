@@ -70,12 +70,37 @@ def build_semantic_descriptors_from_files(filenames):
     return build_semantic_descriptors(sentences)
 
 filenames = ['projects/project 3/war_and_peace.txt', 'projects/project 3/swanns_way.txt']
-d = build_semantic_descriptors_from_files(filenames)
+semantic_descriptors = build_semantic_descriptors_from_files(filenames)
 
 
 def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
-    
+    semantic_similarity_scores = {}
+    for choice in choices:
+        if word in semantic_descriptors and choice in semantic_descriptors:
+            semantic_similarity_scores[choice] = similarity_fn(semantic_descriptors[word], semantic_descriptors[choice])
+        else:
+            semantic_similarity_scores[choice] = -1
+
+    return max(semantic_similarity_scores, key=semantic_similarity_scores.get)
 
 
 def run_similarity_test(filename, semantic_descriptors, similarity_fn):
-    pass
+    correct = 0
+    total = 0
+    
+    with open(filename) as tests:
+        for test in tests:
+            words = test.split(" ")
+            word = words[0]
+            answer = words[1]
+            choices = [choice.strip() for choice in words[2:]]  # Remove '\n' from each choice
+            guess = most_similar_word(word, choices, semantic_descriptors, similarity_fn)
+            # print(f"word is {word}, correct answer is {answer}, choices were {choices}, guess is {guess}")
+            if answer == guess:
+                correct += 1
+            total += 1
+
+        return correct / total * 100
+
+res = run_similarity_test("projects/project 3/test.txt", semantic_descriptors, cosine_similarity)
+print(res, "of the guesses were correct")
