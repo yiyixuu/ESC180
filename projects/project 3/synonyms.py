@@ -21,28 +21,32 @@ def cosine_similarity(vec1, vec2):
             numerator += vec1[key] * vec2[key]
     return numerator/denominator
 
-print(cosine_similarity({"a": 1, "b": 2, "c": 3}, {"b": 4, "c": 5, "d": 6}))
-
 def build_semantic_descriptors(sentences):
     d = {}
+
     for sentence in sentences:
-        unique_words = set(sentence)
-        for word in unique_words:
-            if word not in d:
-                d[word] = {}
-            for other_word in sentence:
-                if other_word != word:
-                    if other_word in d[word]:
-                        d[word][other_word] += 1
-                    else:
-                        d[word][other_word] = 1
+        pairs = [(a, b) for idx, a in enumerate(sentence) for b in sentence[idx + 1:]]
+
+        for pair in pairs:
+            word_1 = pair[0]
+            word_2 = pair[1]
+
+            if word_1 not in d:
+                d[word_1] = {}
+            
+            if word_2 not in d:
+                d[word_2] = {}
+
+            if word_2 not in d[word_1]:
+                d[word_1][word_2] = 1
             else:
-                for other_word in sentence:
-                    if other_word != word:
-                        if other_word in d[word]:
-                            d[word][other_word] += 1
-                        else:
-                            d[word][other_word] = 1
+                d[word_1][word_2] += 1
+
+            if word_1 not in d[word_2]:
+                d[word_2][word_1] = 1
+            else:
+                d[word_2][word_1] += 1
+
     return d
 
 def build_semantic_descriptors_from_files(filenames):
@@ -63,20 +67,14 @@ def build_semantic_descriptors_from_files(filenames):
                 words = sentence.strip().lower().split()
                 if words:
                     sentences.append(words)
-    
     return build_semantic_descriptors(sentences)
-    
-filenames = "/Users/shaanjain/Downloads/ENGSCI/FIRST YEAR/SEM 1/esc180/Projects/ESC180-1/projects/project 3/test.txt"
-print(build_semantic_descriptors_from_files([filenames]))
 
-        
-
-        
-
+filenames = ['projects/project 3/war_and_peace.txt', 'projects/project 3/swanns_way.txt']
+d = build_semantic_descriptors_from_files(filenames)
 
 
 def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
-    pass
+    
 
 
 def run_similarity_test(filename, semantic_descriptors, similarity_fn):
