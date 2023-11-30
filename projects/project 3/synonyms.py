@@ -62,11 +62,12 @@ def build_semantic_descriptors_from_files(filenames):
 
             # Processing each sentence
             for sentence in sentences_list:
-                for punct in [",", "-", "--", ":", ";"]:
+                for punct in [",", "-", "--", ":", ";", "(",")", "'", "\""]:
                     sentence = sentence.replace(punct, " ")
                 words = sentence.strip().lower().split()
                 if words:
                     sentences.append(words)
+
     return build_semantic_descriptors(sentences)
 
 filenames = ['projects/project 3/war_and_peace.txt', 'projects/project 3/swanns_way.txt']
