@@ -52,8 +52,8 @@ def build_semantic_descriptors(sentences):
 def build_semantic_descriptors_from_files(filenames):
     sentences = []
 
-    punct1 = {".", "!", "?"}
-    punct2 = {",", "-", "--", ":", ";", "(", ")", "'", "\""}
+    punct1 = [".", "!", "?"]
+    punct2 = [",", "-", "--", ":", ";", "(", ")", "'", "\""]
 
     for filename in filenames:
         with open(filename, "r", encoding="latin1") as file:
@@ -61,14 +61,18 @@ def build_semantic_descriptors_from_files(filenames):
 
             # Splitting into sentences
             for punct in punct1:
-                content = content.replace(punct, "|")
-            sentences_list = content.split("|")
+                content = content.replace(punct, ".")
+            sentences_list = content.split(".")
+            sentences_list = [sentence.strip() for sentence in sentences_list if sentence]
+
 
             # Processing each sentence
             for sentence in sentences_list:
-                sentence = sentence.translate(str.maketrans("", "", "".join(punct2)))
-                words = [word.lower() for word in sentence.strip().split() if word]
-                sentences.append(words)
+                for punct in punct2:
+                    sentence = sentence.replace(punct, "")
+                sentence = sentence.lower()
+                sentence = sentence.split(" ")
+                sentences.append(sentence)
 
     return build_semantic_descriptors(sentences)
 
