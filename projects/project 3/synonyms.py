@@ -16,7 +16,7 @@ def cosine_similarity(vec1, vec2):
     return numerator/denominator
 
 def build_semantic_descriptors(sentences):
-    d = {}
+    descriptors = {}
 
     for sentence in sentences:
         pairs = [(a, b) for idx, a in enumerate(sentence) for b in sentence[idx + 1:]]
@@ -25,23 +25,23 @@ def build_semantic_descriptors(sentences):
             word_1 = pair[0]
             word_2 = pair[1]
 
-            if word_1 not in d:
-                d[word_1] = {}
+            if word_1 not in descriptors:
+                descriptors[word_1] = {}
             
-            if word_2 not in d:
-                d[word_2] = {}
+            if word_2 not in descriptors:
+                descriptors[word_2] = {}
 
-            if word_2 not in d[word_1]:
-                d[word_1][word_2] = 1
+            if word_2 not in descriptors[word_1]:
+                descriptors[word_1][word_2] = 1
             else:
-                d[word_1][word_2] += 1
+                descriptors[word_1][word_2] += 1
 
-            if word_1 not in d[word_2]:
-                d[word_2][word_1] = 1
+            if word_1 not in descriptors[word_2]:
+                descriptors[word_2][word_1] = 1
             else:
-                d[word_2][word_1] += 1
+                descriptors[word_2][word_1] += 1
 
-    return d
+    return descriptors
 
 def build_semantic_descriptors_from_files(filenames):
     sentences = []
@@ -53,14 +53,11 @@ def build_semantic_descriptors_from_files(filenames):
         with open(filename, "r", encoding="latin1") as file:
             content = file.read()
 
-            # Splitting into sentences
             for punct in punct_sentence:
                 content = content.replace(punct, ".")
             sentences_list = content.split(".")
             sentences_list = [sentence.strip() for sentence in sentences_list if sentence]
 
-
-            # Processing each sentence
             for sentence in sentences_list:
                 for punct in punct_word:
                     sentence = sentence.replace(punct, "")
@@ -80,7 +77,6 @@ def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
 
     return max(semantic_similarity_scores, key=semantic_similarity_scores.get)
 
-
 def run_similarity_test(filename, semantic_descriptors, similarity_fn):
     correct = 0
     total = 0
@@ -90,9 +86,8 @@ def run_similarity_test(filename, semantic_descriptors, similarity_fn):
             words = test.split(" ")
             word = words[0]
             answer = words[1]
-            choices = [choice.strip() for choice in words[2:]]  # Remove '\n' from each choice
+            choices = [choice.strip() for choice in words[2:]]
             guess = most_similar_word(word, choices, semantic_descriptors, similarity_fn)
-            # print(f"word is {word}, correct answer is {answer}, choices were {choices}, guess is {guess}")
             if answer == guess:
                 correct += 1
             total += 1
