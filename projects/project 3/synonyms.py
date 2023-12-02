@@ -1,10 +1,4 @@
-'''Semantic Similarity: starter code
-
-Author: Michael Guerzhoy. Last modified: Nov. 20, 2023.
-'''
-
 import math
-
 
 def norm(vec):
     sum_of_squares = 0.0  
@@ -52,15 +46,15 @@ def build_semantic_descriptors(sentences):
 def build_semantic_descriptors_from_files(filenames):
     sentences = []
 
-    punct1 = [".", "!", "?"]
-    punct2 = [",", "-", "--", ":", ";", "(", ")", "'", "\""]
+    punct_sentence = [".", "!", "?"]
+    punct_word = [",", "-", "--", ":", ";", "(", ")", "'", "\""]
 
     for filename in filenames:
         with open(filename, "r", encoding="latin1") as file:
             content = file.read()
 
             # Splitting into sentences
-            for punct in punct1:
+            for punct in punct_sentence:
                 content = content.replace(punct, ".")
             sentences_list = content.split(".")
             sentences_list = [sentence.strip() for sentence in sentences_list if sentence]
@@ -68,17 +62,13 @@ def build_semantic_descriptors_from_files(filenames):
 
             # Processing each sentence
             for sentence in sentences_list:
-                for punct in punct2:
+                for punct in punct_word:
                     sentence = sentence.replace(punct, "")
                 sentence = sentence.lower()
                 sentence = sentence.split(" ")
                 sentences.append(sentence)
 
     return build_semantic_descriptors(sentences)
-
-filenames = ['projects/project 3/war_and_peace.txt', 'projects/project 3/swanns_way.txt']
-semantic_descriptors = build_semantic_descriptors_from_files(filenames)
-
 
 def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
     semantic_similarity_scores = {}
@@ -108,6 +98,3 @@ def run_similarity_test(filename, semantic_descriptors, similarity_fn):
             total += 1
 
         return correct / total * 100
-
-res = run_similarity_test("projects/project 3/test.txt", semantic_descriptors, cosine_similarity)
-print(res, "of the guesses were correct")
